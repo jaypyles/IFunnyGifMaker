@@ -20,7 +20,7 @@ def calculate_fontsize(draw, text, font_name, rect_len, rec_width, text_y, text_
     font =ImageFont.truetype(font_name, font_val)
     length_ratio = 0
 
-    while length_ratio < 0.90:
+    while length_ratio < 0.85:
         text_lines = textwrap.wrap(text, 25)
         max_line_width = 0
         for line in text_lines:
