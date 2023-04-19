@@ -14,26 +14,31 @@ def create_gif(query):
     with open("found.gif", "wb+") as f:
         f.write(image_response.content)
 
-def calculate_fontsize(draw, text, font_name, rect_len, rec_width, text_y, text_x):
-    print(rect_len)
+def calculate_fontsize(draw, text, font_name, rect_len, rect_width, text_y, text_x):
     font_val = 0
-    font =ImageFont.truetype(font_name, font_val)
+    font = ImageFont.truetype(font_name, font_val)
     length_ratio = 0
+    height_ratio = 0
 
-    while length_ratio < 0.85:
+    while length_ratio < 0.85 and height_ratio < 0.85:
         text_lines = textwrap.wrap(text, 25)
+        line_heights = []
         max_line_width = 0
         for line in text_lines:
-            line_size = font.getsize(line)  
+            line_size = font.getsize(line)
+            line_heights.append(line_size[1])
             if line_size[0] > max_line_width:
                 max_line_width = line_size[0]
         text_width = max_line_width
-        length_ratio = text_width / rec_width
-        font_val += 1 
+        text_height = sum(line_heights)
+        length_ratio = text_width / rect_width
+        height_ratio = text_height / rect_len
+        font_val += 1
         font = ImageFont.truetype(font_name, font_val)
+
     return font_val
 
-def edit_gif():
+def edit_gif(text: str):
 # Open the GIF file
     with Image.open("found.gif") as im:
         # Loop over all the frames in the GIF
@@ -51,9 +56,6 @@ def edit_gif():
             # Create a drawing object
             draw = ImageDraw.Draw(new_im)
 
-            # Define the text to be written on the rectangle
-            text = "when michael's screen is shining"
-
             # Define the font for the text
             font = ImageFont.truetype("Futura Condensed Extra Bold.otf", 15)
             
@@ -63,7 +65,7 @@ def edit_gif():
             # Calculate the position for the text
             text_x = (new_im.width - text_size[0] - 25) // 2
             text_y = ((padding_size - 50) - text_size[1]) // 2
-            size = calculate_fontsize(draw=draw, text=text, rect_len=padding_size, rec_width=new_im.width, font_name="Futura Condensed Extra Bold.otf", text_x=text_x, text_y=text_y) 
+            size = calculate_fontsize(draw=draw, text=text, rect_len=padding_size, rect_width=new_im.width, font_name="Futura Condensed Extra Bold.otf", text_x=text_x, text_y=text_y) 
 
             # Define the font for the text
             font = ImageFont.truetype("Futura Condensed Extra Bold.otf", size)
@@ -94,6 +96,6 @@ def clean_up():
     
 if __name__ == "__main__":
     load_dotenv()
-    create_gif("that+moment+when")
-    edit_gif()
+    create_gif("UAB")
+    edit_gif("my boy ray watts profiting off of poor college students")
     clean_up()
