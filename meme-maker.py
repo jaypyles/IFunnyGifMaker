@@ -1,18 +1,24 @@
+from typing import Optional
 import requests
 from PIL import Image, ImageDraw, ImageFont
 import textwrap
 import os
 from dotenv import load_dotenv
 
-def create_gif(query):
-    tenor_key = os.getenv("TENOR_API_KEY")
-    response = requests.get(f"https://tenor.googleapis.com/v2/search?q={query}&key={tenor_key}")
-    image_url = response.json().get('results')[0].get('media_formats').get('gif').get('url')
+def create_gif(query: Optional[str]=None, url: Optional[str]=None):
+    if url is None:
+        tenor_key = os.getenv("TENOR_API_KEY")
+        response = requests.get(f"https://tenor.googleapis.com/v2/search?q={query}&key={tenor_key}")
+        image_url = response.json().get('results')[0].get('media_formats').get('gif').get('url')
 
-    image_response = requests.get(image_url)
+        image_response = requests.get(image_url)
 
-    with open("found.gif", "wb+") as f:
-        f.write(image_response.content)
+        with open("found.gif", "wb+") as f:
+            f.write(image_response.content)
+    else:
+        image_response = requests.get(url)
+        with open("found.gif", "wb+") as f:
+            f.write(image_response.content)
 
 def calculate_fontsize(draw, text, font_name, rect_len, rect_width, text_y, text_x):
     font_val = 0
@@ -96,6 +102,6 @@ def clean_up():
     
 if __name__ == "__main__":
     load_dotenv()
-    create_gif("UAB")
-    edit_gif("my boy ray watts profiting off of poor college students")
+    create_gif(query="super+sus")
+    edit_gif("amog us sus")
     clean_up()
