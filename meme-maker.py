@@ -2,40 +2,35 @@ import requests
 from PIL import Image, ImageDraw, ImageFont
 import textwrap
 import os
+from dotenv import load_dotenv
 
 def create_gif(query):
-    response = requests.get(f"https://api.giphy.com/v1/gifs/search?api_key=fmAqviQQ3vt1gGXZt4vrY37EYlV39gJ0&q={query}&limit=1&offset=0&rating=g&lang=en")
-    image_url = response.json().get("data")[0].get("images").get("original").get("url")
+    tenor_key = os.getenv("TENOR_API_KEY")
+    response = requests.get(f"https://tenor.googleapis.com/v2/search?q={query}&key={tenor_key}")
+    image_url = response.json().get('results')[0].get('media_formats').get('gif').get('url')
+
     image_response = requests.get(image_url)
 
-    with open("found.gif", "wb") as f:
+    with open("found.gif", "wb+") as f:
         f.write(image_response.content)
 
 def calculate_fontsize(draw, text, font_name, rect_len, rec_width, text_y, text_x):
+    print(rect_len)
     font_val = 0
     font =ImageFont.truetype(font_name, font_val)
-    font_ratio = 0
-    y = text_y
-    rectangle_area = rect_len * rec_width
+    length_ratio = 0
 
-    while font_ratio < 0.50:
-        text_lines = textwrap.wrap(text, 50)
-        line_heights = []
-        text_y = y
+    while length_ratio < 0.90:
+        text_lines = textwrap.wrap(text, 25)
         max_line_width = 0
         for line in text_lines:
             line_size = font.getsize(line)  
-            line_heights.append(line_size[1])
-            text_y += line_size[1]
             if line_size[0] > max_line_width:
                 max_line_width = line_size[0]
         text_width = max_line_width
-        text_height = sum(line_heights)
-        text_area = text_width * text_height
-        font_ratio = text_area/rectangle_area
-        font_val += 1
+        length_ratio = text_width / rec_width
+        font_val += 1 
         font = ImageFont.truetype(font_name, font_val)
-
     return font_val
 
 def edit_gif():
@@ -57,7 +52,7 @@ def edit_gif():
             draw = ImageDraw.Draw(new_im)
 
             # Define the text to be written on the rectangle
-            text = "pizza moment"
+            text = "when michael's screen is shining"
 
             # Define the font for the text
             font = ImageFont.truetype("Futura Condensed Extra Bold.otf", 15)
@@ -98,6 +93,7 @@ def clean_up():
     os.remove("found.gif")
     
 if __name__ == "__main__":
-    create_gif("pizza")
+    load_dotenv()
+    create_gif("that+moment+when")
     edit_gif()
     clean_up()
