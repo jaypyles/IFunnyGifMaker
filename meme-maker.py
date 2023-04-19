@@ -20,7 +20,7 @@ def create_gif(query: Optional[str]=None, url: Optional[str]=None):
         with open("found.gif", "wb+") as f:
             f.write(image_response.content)
 
-def calculate_fontsize(draw, text, font_name, rect_len, rect_width, text_y, text_x):
+def calculate_fontsize(text, font_name, rect_len, rect_width):
     font_val = 0
     font = ImageFont.truetype(font_name, font_val)
     length_ratio = 0
@@ -69,21 +69,18 @@ def edit_gif(text: str):
             text_size = draw.textsize(text, font=font)
 
             # Calculate the position for the text
-            text_x = (new_im.width - text_size[0] - 25) // 2
             text_y = ((padding_size - 50) - text_size[1]) // 2
-            size = calculate_fontsize(draw=draw, text=text, rect_len=padding_size, rect_width=new_im.width, font_name="Futura Condensed Extra Bold.otf", text_x=text_x, text_y=text_y) 
+            size = calculate_fontsize(text=text, rect_len=padding_size, rect_width=new_im.width, font_name="Futura Condensed Extra Bold.otf") 
 
             # Define the font for the text
             font = ImageFont.truetype("Futura Condensed Extra Bold.otf", size)
 
             # Draw the text on the rectangle
             text_lines = textwrap.wrap(text, width= 25)
-            line_heights = []
             for line in text_lines:
                 line_size = draw.textsize(line, font=font) #draw the text
                 line_x = (new_im.width - line_size[0]) // 2
                 draw.text((line_x, text_y), line, font=font, fill=0)
-                line_heights.append(line_size[1])
                 text_y += line_size[1]
 
             # Add the new frame to the list
@@ -103,5 +100,5 @@ def clean_up():
 if __name__ == "__main__":
     load_dotenv()
     create_gif(query="super+sus")
-    edit_gif("amog us sus")
+    edit_gif("amog us sus among us baka super sus")
     clean_up()
