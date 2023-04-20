@@ -6,7 +6,7 @@ import os
 from dotenv import load_dotenv
 
 class MemeMaker:
-    def __init__(self, query, url, text):
+    def __init__(self, text: str, url: Optional[str] = None,  query: Optional[str] = None):
         self.query = query
         self.url = url
         self.text = text
@@ -106,11 +106,17 @@ class MemeMaker:
 
     def make_meme(self):
        load_dotenv() 
-       self.__create_gif(query="big+dog")
-       self.__edit_gif("funny") 
+       if self.query is None:
+            self.query = self.text.replace(" ", "+")
+       if self.query is not None and self.url is not None:
+            self.query = None
+       if self.query is not None:
+            self.query = self.query.replace(" ", "+")
+       self.__create_gif(self.query)
+       self.__edit_gif(self.text) 
        self.__clean_up() 
 
 if __name__ == "__main__":
-    m = MemeMaker()
+    m = MemeMaker("example text")
     m.make_meme()
 
