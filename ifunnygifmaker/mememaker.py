@@ -49,6 +49,8 @@ class MemeMaker:
         return font_val
 
     def __edit_gif(self, text: str):
+        font_path = os.path.join(os.path.dirname(__file__), 'fonts', 'Futura Condensed Extra Bold.otf')
+
         # Open the GIF file
         with Image.open("found.gif") as im:
             # Loop over all the frames in the GIF
@@ -67,7 +69,7 @@ class MemeMaker:
                 draw = ImageDraw.Draw(new_im)
 
                 # Define the font for the text
-                font = ImageFont.truetype("ifunnygifmaker/Futura Condensed Extra Bold.otf", 15)
+                font = ImageFont.truetype(font_path, 15)
                 
                 # Get the size of the text
                 text_size = draw.textsize(text, font=font)
@@ -75,10 +77,10 @@ class MemeMaker:
                 # Calculate the position for the text
                 text_y = ((padding_size - 50) - text_size[1]) // 2
                 wrap = new_im.width * 0.1
-                size = self.__calculate_fontsize(text=text, rect_len=padding_size, rect_width=new_im.width, wrap=wrap, font_name="ifunnygifmaker/Futura Condensed Extra Bold.otf") 
+                size = self.__calculate_fontsize(text=text, rect_len=padding_size, rect_width=new_im.width, wrap=wrap, font_name=font_path) 
 
                 # Define the font for the text
-                font = ImageFont.truetype("ifunnygifmaker/Futura Condensed Extra Bold.otf", size)
+                font = ImageFont.truetype(font_path, size)
 
                 # Draw the text on the rectangle
                 text_lines = textwrap.wrap(text, width=wrap)
@@ -116,5 +118,4 @@ class MemeMaker:
 
 if __name__ == "__main__":
     m = MemeMaker()
-    m.make_meme(text="")
-
+    m.make_meme(text="lol")
