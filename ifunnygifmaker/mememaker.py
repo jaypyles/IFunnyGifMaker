@@ -69,7 +69,7 @@ class MemeMaker:
                 draw = ImageDraw.Draw(new_im)
 
                 # Define the font for the text
-                font = ImageFont.truetype("Futura Condensed Extra Bold.otf", 15)
+                font = ImageFont.truetype("ifunnygifmaker/Futura Condensed Extra Bold.otf", 15)
                 
                 # Get the size of the text
                 text_size = draw.textsize(text, font=font)
@@ -77,10 +77,10 @@ class MemeMaker:
                 # Calculate the position for the text
                 text_y = ((padding_size - 50) - text_size[1]) // 2
                 wrap = new_im.width * 0.1
-                size = self.__calculate_fontsize(text=text, rect_len=padding_size, rect_width=new_im.width, wrap=wrap, font_name="Futura Condensed Extra Bold.otf") 
+                size = self.__calculate_fontsize(text=text, rect_len=padding_size, rect_width=new_im.width, wrap=wrap, font_name="ifunnygifmaker/Futura Condensed Extra Bold.otf") 
 
                 # Define the font for the text
-                font = ImageFont.truetype("Futura Condensed Extra Bold.otf", size)
+                font = ImageFont.truetype("ifunnygifmaker/Futura Condensed Extra Bold.otf", size)
 
                 # Draw the text on the rectangle
                 text_lines = textwrap.wrap(text, width=wrap)
@@ -112,11 +112,11 @@ class MemeMaker:
             self.query = None
        if self.query is not None:
             self.query = self.query.replace(" ", "+")
-       self.__create_gif(self.query)
+       self.__create_gif(query=self.query, url=self.url)
        self.__edit_gif(self.text) 
        self.__clean_up() 
 
 if __name__ == "__main__":
-    m = MemeMaker("example text")
+    m = MemeMaker("when alex gets -10 for not zipping his makefile", query="funny")
     m.make_meme()
 
