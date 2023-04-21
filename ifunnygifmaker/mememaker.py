@@ -6,10 +6,8 @@ import os
 from dotenv import load_dotenv
 
 class MemeMaker:
-    def __init__(self, text: str, url: Optional[str] = None,  query: Optional[str] = None):
-        self.query = query
-        self.url = url
-        self.text = text
+    def __init__(self):
+        pass
 
     def __create_gif(self, query: Optional[str]=None, url: Optional[str]=None):
         if url is None:
@@ -104,19 +102,19 @@ class MemeMaker:
     def __clean_up(self):
         os.remove("found.gif")
 
-    def make_meme(self):
+    def make_meme(self, text: str, query: Optional[str]=None, url: Optional[str]=None):
        load_dotenv() 
-       if self.query is None:
-            self.query = self.text.replace(" ", "+")
-       if self.query is not None and self.url is not None:
-            self.query = None
-       if self.query is not None:
-            self.query = self.query.replace(" ", "+")
-       self.__create_gif(query=self.query, url=self.url)
-       self.__edit_gif(self.text) 
+       if query is None:
+            query = text.replace(" ", "+")
+       if query is not None and url is not None:
+            query = None
+       if query is not None:
+            query = query.replace(" ", "+")
+       self.__create_gif(query=query, url=url)
+       self.__edit_gif(text) 
        self.__clean_up() 
 
 if __name__ == "__main__":
-    m = MemeMaker("when alex gets -10 for not zipping his makefile", query="funny")
-    m.make_meme()
+    m = MemeMaker()
+    m.make_meme(text="")
 
