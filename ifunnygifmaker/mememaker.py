@@ -92,7 +92,7 @@ class MemeMaker:
 
                 # Calculate the position for the text
                 text_y = ((padding_size - 50) - text_size[1]) // 2
-                wrap = new_im.width * 0.1
+                wrap = new_im.width * 0.05
                 size = self.__calculate_fontsize(
                     text=text,
                     rect_len=padding_size,
@@ -140,3 +140,10 @@ class MemeMaker:
         self.__create_gif(query=query, url=url)
         self.__edit_gif(text)
         self.__clean_up()
+
+
+if __name__ == "__main__":
+    load_dotenv()
+    token = os.getenv("TENOR_API_KEY")
+    m = MemeMaker(token)
+    m.make_meme(text="")
