@@ -1,19 +1,33 @@
-from typing import Optional
-import requests
-from PIL import Image, ImageDraw, ImageFont
-import textwrap
 import os
+import textwrap
+from typing import Optional
+
+import requests
 from dotenv import load_dotenv
+from PIL import Image, ImageDraw, ImageFont
+
 
 class MemeMaker:
-    def __init__(self):
-        pass
+    def __init__(self, token):
+        """
+        An engine for making memes
+        :token: your tenor api token
+        """
+        self.token = token
 
-    def __create_gif(self, query: Optional[str]=None, url: Optional[str]=None):
+    def __create_gif(self, query: Optional[str] = None, url: Optional[str] = None):
         if url is None:
             tenor_key = os.getenv("TENOR_API_KEY")
-            response = requests.get(f"https://tenor.googleapis.com/v2/search?q={query}&key={tenor_key}")
-            image_url = response.json().get('results')[0].get('media_formats').get('gif').get('url')
+            response = requests.get(
+                f"https://tenor.googleapis.com/v2/search?q={query}&key={tenor_key}"
+            )
+            image_url = (
+                response.json()
+                .get("results")[0]
+                .get("media_formats")
+                .get("gif")
+                .get("url")
+            )
 
             image_response = requests.get(image_url)
 
@@ -49,7 +63,9 @@ class MemeMaker:
         return font_val
 
     def __edit_gif(self, text: str):
-        font_path = os.path.join(os.path.dirname(__file__), 'fonts', 'Futura Condensed Extra Bold.otf')
+        font_path = os.path.join(
+            os.path.dirname(__file__), "fonts", "Futura Condensed Extra Bold.otf"
+        )
 
         # Open the GIF file
         with Image.open("found.gif") as im:
@@ -70,14 +86,20 @@ class MemeMaker:
 
                 # Define the font for the text
                 font = ImageFont.truetype(font_path, 15)
-                
+
                 # Get the size of the text
                 text_size = draw.textsize(text, font=font)
 
                 # Calculate the position for the text
                 text_y = ((padding_size - 50) - text_size[1]) // 2
                 wrap = new_im.width * 0.1
-                size = self.__calculate_fontsize(text=text, rect_len=padding_size, rect_width=new_im.width, wrap=wrap, font_name=font_path) 
+                size = self.__calculate_fontsize(
+                    text=text,
+                    rect_len=padding_size,
+                    rect_width=new_im.width,
+                    wrap=wrap,
+                    font_name=font_path,
+                )
 
                 # Define the font for the text
                 font = ImageFont.truetype(font_path, size)
@@ -85,7 +107,7 @@ class MemeMaker:
                 # Draw the text on the rectangle
                 text_lines = textwrap.wrap(text, width=wrap)
                 for line in text_lines:
-                    line_size = draw.textsize(line, font=font) #draw the text
+                    line_size = draw.textsize(line, font=font)  # draw the text
                     line_x = (new_im.width - line_size[0]) // 2
                     draw.text((line_x, text_y), line, font=font, fill=0)
                     text_y += line_size[1]
@@ -98,24 +120,23 @@ class MemeMaker:
                 "out.gif",
                 save_all=True,
                 append_images=frames[1:],
-                duration=im.info['duration'],
+                duration=im.info["duration"],
                 loop=0,
             )
+
     def __clean_up(self):
         os.remove("found.gif")
 
-    def make_meme(self, text: str, query: Optional[str]=None, url: Optional[str]=None):
-       load_dotenv() 
-       if query is None:
+    def make_meme(
+        self, text: str, query: Optional[str] = None, url: Optional[str] = None
+    ):
+        load_dotenv()
+        if query is None:
             query = text.replace(" ", "+")
-       if query is not None and url is not None:
+        if query is not None and url is not None:
             query = None
-       if query is not None:
+        if query is not None:
             query = query.replace(" ", "+")
-       self.__create_gif(query=query, url=url)
-       self.__edit_gif(text) 
-       self.__clean_up() 
-
-if __name__ == "__main__":
-    m = MemeMaker()
-    m.make_meme(text="lol")
+        self.__create_gif(query=query, url=url)
+        self.__edit_gif(text)
+        self.__clean_up()
