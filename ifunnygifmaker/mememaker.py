@@ -17,7 +17,7 @@ class MemeMaker:
 
     def __create_gif(self, query: Optional[str] = None, url: Optional[str] = None):
         if url is None:
-            tenor_key = os.getenv("TENOR_API_KEY")
+            tenor_key = self.token
             response = requests.get(
                 f"https://tenor.googleapis.com/v2/search?q={query}&key={tenor_key}"
             )
