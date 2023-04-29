@@ -92,7 +92,7 @@ class MemeMaker:
 
                 # Calculate the position for the text
                 text_y = ((padding_size - 50) - text_size[1]) // 2
-                wrap = new_im.width * 0.05
+                wrap = 40
                 size = self.__calculate_fontsize(
                     text=text,
                     rect_len=padding_size,
