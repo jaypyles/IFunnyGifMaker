@@ -4,5 +4,5 @@ This is a simple implementation to create captioned gifs, like those that appear
 
 # To-Do
 
-- [] Implement a faster way to compile the gifs
-- [] Refactor the font size calculator
+- [ ] Implement a faster way to compile the gifs
+- [ ] Refactor the font size calculator
