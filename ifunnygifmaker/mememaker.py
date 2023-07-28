@@ -45,7 +45,7 @@ class MemeMaker:
             with open("found.gif", "wb+") as f:
                 f.write(image_response.content)
 
-    def __add_text(self, gif_path, font_path, font_size, output_path):
+    def __add_text(self, text, gif_path, font_path, font_size, output_path):
         gif = Image.open(gif_path)
         frames = [frame.copy() for frame in ImageSequence.Iterator(gif)]
 
@@ -64,7 +64,7 @@ class MemeMaker:
         font_color = (0, 0, 0)  # Black text color (adjust if needed)
 
         # Generate text block (modify this logic based on your requirements)
-        text = "wow"
+        text = text
         wrapped_text = get_wrapped_text(text, font, temp_img.width - padding_width)
         _, text_height = temp_draw.textsize(wrapped_text, font)
 
@@ -145,7 +145,7 @@ class MemeMaker:
         if query is not None:
             query = query.replace(" ", "+")
         self.__create_gif(query=query, url=url)
-        self.__add_text("found.gif", FONT_PATH, FONT_SIZE, "out.gif")
+        self.__add_text(text, "found.gif", FONT_PATH, FONT_SIZE, "out.gif")
         self.__clean_up()
 
 
