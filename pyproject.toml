@@ -1,6 +1,6 @@
 [project]
 name = "ifunnygifmaker"
-version = "1.0.0"
+version = "1.0.3"
 description = ""
 authors = [
     {name = "jaypyles", email = "jpylesbusiness@gmail.com"},

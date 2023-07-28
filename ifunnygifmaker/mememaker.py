@@ -10,7 +10,7 @@ from ifunnygifmaker.utils.image_utils import get_wrapped_text
 FONT_PATH = os.path.join(
     os.path.dirname(__file__), "fonts", "Futura Condensed Extra Bold.otf"
 )
-FONT_SIZE = 30
+FONT_SIZE = 38
 PADDING = 0.1
 
 
