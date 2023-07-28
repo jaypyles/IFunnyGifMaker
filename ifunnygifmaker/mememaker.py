@@ -1,10 +1,17 @@
 import os
-import textwrap
 from typing import Optional
 
 import requests
 from dotenv import load_dotenv
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageSequence
+
+from ifunnygifmaker.utils.image_utils import get_wrapped_text
+
+FONT_PATH = os.path.join(
+    os.path.dirname(__file__), "fonts", "Futura Condensed Extra Bold.otf"
+)
+FONT_SIZE = 30
+PADDING = 0.1
 
 
 class MemeMaker:
@@ -38,91 +45,91 @@ class MemeMaker:
             with open("found.gif", "wb+") as f:
                 f.write(image_response.content)
 
-    def __calculate_fontsize(self, text, font_name, rect_len, rect_width, wrap):
-        font_val = 0
-        font = ImageFont.truetype(font_name, font_val)
-        length_ratio = 0
-        height_ratio = 0
+    def __add_text(self, gif_path, font_path, font_size, output_path):
+        gif = Image.open(gif_path)
+        frames = [frame.copy() for frame in ImageSequence.Iterator(gif)]
 
-        while length_ratio < 0.85 and height_ratio < 0.85:
-            text_lines = textwrap.wrap(text, wrap)
-            line_heights = []
-            max_line_width = 0
-            for line in text_lines:
-                line_size = font.getsize(line)
-                line_heights.append(line_size[1])
-                if line_size[0] > max_line_width:
-                    max_line_width = line_size[0]
-            text_width = max_line_width
-            text_height = sum(line_heights)
-            length_ratio = text_width / rect_width
-            height_ratio = text_height / rect_len
-            font_val += 1
-            font = ImageFont.truetype(font_name, font_val)
+        gif_width, gif_height = gif.size
+        modified_frames = []
 
-        return font_val
+        # Define padding for the text box
+        padding_width = PADDING * gif_width
 
-    def __edit_gif(self, text: str):
-        font_path = os.path.join(
-            os.path.dirname(__file__), "fonts", "Futura Condensed Extra Bold.otf"
-        )
+        # generate temporary image to determine text size
+        temp_img = Image.new("RGBA", gif.size)
+        temp_draw = ImageDraw.Draw(temp_img)
 
-        # Open the GIF file
-        with Image.open("found.gif") as im:
-            # Loop over all the frames in the GIF
-            frames = []
-            for frame in range(im.n_frames):
-                im.seek(frame)
+        # generate font
+        font = ImageFont.truetype(font_path, font_size)
+        font_color = (0, 0, 0)  # Black text color (adjust if needed)
 
-                # Create a new image with the required dimensions for each frame
-                padding_size = 85
-                new_im = Image.new("RGB", (im.width, im.height + padding_size), "white")
+        # Generate text block (modify this logic based on your requirements)
+        text = "wow"
+        wrapped_text = get_wrapped_text(text, font, temp_img.width - padding_width)
+        _, text_height = temp_draw.textsize(wrapped_text, font)
 
-                # Paste the original GIF image onto the new image
-                new_im.paste(im, (0, 100))
+        white_box_padding = PADDING + 0.1
 
-                # Create a drawing object
-                draw = ImageDraw.Draw(new_im)
-
-                # Define the font for the text
-                font = ImageFont.truetype(font_path, 15)
-
-                # Get the size of the text
-                text_size = draw.textsize(text, font=font)
-
-                # Calculate the position for the text
-                text_y = ((padding_size - 50) - text_size[1]) // 2
-                wrap = 40
-                size = self.__calculate_fontsize(
-                    text=text,
-                    rect_len=padding_size,
-                    rect_width=new_im.width,
-                    wrap=wrap,
-                    font_name=font_path,
-                )
-
-                # Define the font for the text
-                font = ImageFont.truetype(font_path, size)
-
-                # Draw the text on the rectangle
-                text_lines = textwrap.wrap(text, width=wrap)
-                for line in text_lines:
-                    line_size = draw.textsize(line, font=font)  # draw the text
-                    line_x = (new_im.width - line_size[0]) // 2
-                    draw.text((line_x, text_y), line, font=font, fill=0)
-                    text_y += line_size[1]
-
-                # Add the new frame to the list
-                frames.append(new_im)
-
-            # Save the new GIF with all its frames
-            frames[0].save(
-                "out.gif",
-                save_all=True,
-                append_images=frames[1:],
-                duration=im.info["duration"],
-                loop=0,
+        for frame in frames:
+            # Create a new image with the required dimensions (adjusted for extra space on top)
+            new_img = Image.new(
+                "RGBA",
+                (
+                    gif_width,
+                    gif_height + (text_height + int(text_height * white_box_padding)),
+                ),
+                (255, 255, 255, 255),
             )
+
+            # Prepare text overlay on the transparent image
+            trans_image = Image.new("RGBA", new_img.size, (0, 0, 0, 0))
+            draw_text = ImageDraw.Draw(trans_image)
+
+            # Calculate the size of the white box based on the text
+            white_box_width, white_box_height = draw_text.textsize(
+                wrapped_text, font=font
+            )
+
+            # Create white image that is the size of the text
+            white_image = Image.new(
+                "RGBA",
+                (
+                    int(white_box_width + int(white_box_width * white_box_padding)),
+                    int(white_box_height + int(white_box_height * white_box_padding)),
+                ),
+                (255, 255, 255, 255),
+            )
+            white_draw = ImageDraw.Draw(
+                white_image
+            )  # Create a new ImageDraw object for the white image
+
+            # Draw the text on the white image
+            white_draw.multiline_text(
+                (0, 0),
+                wrapped_text,
+                font=font,
+                fill=font_color,
+                align="center",
+            )
+
+            # Combine the transparent image with the current frame and the white box
+            new_img.paste(white_image, (int((gif_width - white_box_width) / 2), 0))
+            new_img.paste(
+                frame, (0, text_height + int(text_height * white_box_padding))
+            )  # Paste the original frame below the white box
+
+            # Add the new frame to the list of modified frames
+            modified_frames.append(new_img)
+
+        # Save the modified frames as a new GIF
+        modified_frames[0].save(
+            output_path,
+            format="GIF",
+            save_all=True,
+            append_images=modified_frames[1:],
+            duration=gif.info["duration"],
+            loop=gif.info.get("loop", 0),
+        )
 
     def __clean_up(self):
         os.remove("found.gif")
@@ -138,7 +145,7 @@ class MemeMaker:
         if query is not None:
             query = query.replace(" ", "+")
         self.__create_gif(query=query, url=url)
-        self.__edit_gif(text)
+        self.__add_text("found.gif", FONT_PATH, FONT_SIZE, "out.gif")
         self.__clean_up()
 
 
